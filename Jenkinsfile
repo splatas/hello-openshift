@@ -1,18 +1,18 @@
 pipeline {
-    agent {}
+    agent any
     stages {
         stage('Init') {
             when {
                 expression {
                     openshift.withCluster() {
-                        return !openshift.selector('project', 'hello-dev').exists();
+                        return !openshift.selector('project', 'hello-test').exists();
                     }
                 }
             }
             steps {
                 script {
                     openshift.withCluster() {
-                        openshift.newProject('hello-dev');
+                        openshift.newProject('hello-test');
                     }
                 }
             }    
