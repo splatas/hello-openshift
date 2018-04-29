@@ -1,6 +1,6 @@
 pipeline {
     agent any
-
+    options { skipDefaultCheckout() }
     stages {
         stage("Build Image") {
             steps {
