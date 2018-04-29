@@ -7,7 +7,7 @@ Hello world example for OpenShift.
 * An **OpenShift** cluster (3.7 or higher)
 * The **OpenShift** CLI client (**oc**)
 
-## Provision
+## Usage
 
 See the **provision.sh** script file.
 
@@ -19,6 +19,6 @@ The script will create 3 projects (environments):
 * hello-test
 * hello-prod
 
-The Jenkins which orchestrates the deployments is deployed in the hello-dev project.
+The **Jenkins** which orchestrates the deployments is deployed in the **hello-dev** project.
 
-Check the Jenkinsfile for the pipeline execution details.
+Check the **Jenkinsfile** for the pipeline execution details.
