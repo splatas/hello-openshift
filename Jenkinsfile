@@ -71,7 +71,7 @@ pipeline {
                                 createApp("${APP}", pom.version);                   
                             } else {
                                 // Rollouts to latest version
-                                openshift.selector("dc", "${APP}").rollout().latest();   
+                                deployApp(env.APP, pom.version);
                             }                            
                         }
                     }
@@ -96,7 +96,7 @@ pipeline {
                                 createApp("${APP}", pom.version);                   
                             } else {
                                 // Rollouts to latest version
-                                openshift.selector("dc", "${APP}").rollout().latest();   
+                                deployApp(env.APP, pom.version);
                             }                            
                         }
                     }
@@ -104,6 +104,11 @@ pipeline {
             }
         }          
     }
+}
+
+def deployApp(app, version) {
+    openshift.patch("dc/${app}", "{'spec':{'triggers':[{'type':'ImageChange','imageChangeParams':{'containerNames':['${app}'],'from':{'kind':'ImageStreamTag','name':'${app}:${version}'}}}]}}}")
+    openshift.selector("dc", "${app}").rollout().latest();  
 }
 
 def createApp(app, tag) {
