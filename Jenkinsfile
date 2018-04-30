@@ -7,13 +7,19 @@ pipeline {
     }
     stages {
         stage("Checkout SCM") {
-            git branch: env.BRANCH, url: env.REPO
+            steps {
+                git branch: env.BRANCH, url: env.REPO
+            }
         }
         stage("Compile") {
-            sh "mvn package -DskipTests"
+            steps {
+                sh "mvn package -DskipTests"
+            }
         }
         stage("Test") {
-            sh "mvn test"
+            steps {
+                sh "mvn test"
+            }
         }
         stage("Build Image") {
             steps {
