@@ -107,7 +107,7 @@ pipeline {
 }
 
 def deployApp(app, version) {
-    openshift.patch("dc/${app}", "{'spec':{'triggers':[{'type':'ImageChange','imageChangeParams':{'containerNames':['${app}'],'from':{'kind':'ImageStreamTag','name':'${app}:${version}'}}}]}}}")
+    openshift.patch("dc/${app}", "\"{'spec':{'triggers':[{'type':'ImageChange','imageChangeParams':{'containerNames':['${app}'],'from':{'kind':'ImageStreamTag','name':'${app}:${version}'}}}]}}}\"")
     openshift.selector("dc", "${app}").rollout().latest();  
 }
 
