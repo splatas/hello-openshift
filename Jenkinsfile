@@ -90,7 +90,7 @@ pipeline {
                             pom = readMavenPom file: 'pom.xml'
 
                             // Promotes images between environments
-                            openshift.tag("${APP}-test/he${APP}llo:${pom.version}", "${APP}-prod/${APP}:${pom.version}");
+                            openshift.tag("${APP}-test/${APP}:${pom.version}", "${APP}-prod/${APP}:${pom.version}");
 
                             if (!openshift.selector("dc", "${APP}").exists()) {
                                 createApp("${APP}", pom.version);                   
@@ -108,17 +108,13 @@ pipeline {
 
 def createApp(app, tag) {
     // Creates the application and get the brand new BuildConfig
-    openshift.newApp("${app}:${tag}");
-    // Creates the hello Route
+    def dc = openshift.newApp("${app}:${tag}").narrow("dc");
+    // Creates the app Route
     openshift.selector("svc", app).expose();
 
     // Waits for the deployment to finish
-    def latestDeploymentVersion = openshift.selector("dc", app).object().status.latestVersion
-    def rc = openshift.selector("rc", "${app}-${latestDeploymentVersion}")
-
-    rc.untilEach(1){
-        def rcMap = it.object()
-        return (rcMap.status.replicas.equals(rcMap.status.readyReplicas))
+    while (dc.object().spec.replicas != dc.object().status.availableReplicas) {
+        sleep 10
     }
     
     // Removes the triggers  
