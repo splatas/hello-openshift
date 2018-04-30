@@ -43,7 +43,7 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject("${APP}-dev") {
                             if (!openshift.selector("dc", "${APP}").exists()) {
-                                createApp("${APP}");                   
+                                createApp("${APP}", "latest");                   
                             } else {
                                 // Rollouts to latest version
                                 openshift.selector("dc", "${APP}").rollout().latest();   
