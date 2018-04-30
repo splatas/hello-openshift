@@ -1,18 +1,30 @@
 pipeline {
-    agent any
-    options { skipDefaultCheckout() }
+    agent {
+        label "maven"
+    }
+    options { 
+        skipDefaultCheckout() 
+    }
     stages {
+        stage("Checkout SCM") {
+            git branch: env.BRANCH, url: env.REPO
+        }
+        stage("Compile") {
+            sh "mvn package -DskipTests"
+        }
+        stage("Test") {
+            sh "mvn test"
+        }
         stage("Build Image") {
             steps {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${APP}-dev") {
                             if (!openshift.selector("bc", "${APP}").exists()) {
-                                createAppBuild("${APP}", "${REPO}", "${BRANCH}");                
-                            } else {
-                                // Starts a new build and waits for its completion
-                                openshift.selector("bc", "${APP}").startBuild("--wait=true");
+                                openshift.newBuild("--image-stream=redhat-openjdk18-openshift:1.2", "--name=${app}").narrow("bc");                   
                             }
+                            // Starts a new build and waits for its completion
+                            openshift.selector("bc", "${APP}").startBuild("--from-file=target/${APP}-swarm.jar", "--wait=true");
                         }
                     }
                 }
@@ -43,11 +55,14 @@ pipeline {
 
                     openshift.withCluster {
                         openshift.withProject("${APP}-test") {
+                            // Gets application version
+                            pom = readMavenPom file: 'pom.xml'
+
                             // Promotes images between environments
-                            openshift.tag("${APP}-dev/hello:latest", "${APP}-test/hello:latest");
+                            openshift.tag("${APP}-dev/${APP}:latest", "${APP}-test/${APP}:${pom.version}");
 
                             if (!openshift.selector("dc", "${APP}").exists()) {
-                                createApp("${APP}");                   
+                                createApp("${APP}", pom.version);                   
                             } else {
                                 // Rollouts to latest version
                                 openshift.selector("dc", "${APP}").rollout().latest();   
@@ -65,11 +80,14 @@ pipeline {
 
                     openshift.withCluster {
                         openshift.withProject("${APP}-prod") {
+                            // Gets application version
+                            pom = readMavenPom file: 'pom.xml'
+
                             // Promotes images between environments
-                            openshift.tag("${APP}-test/hello:latest", "${APP}-prod/hello:latest");
+                            openshift.tag("${APP}-test/he${APP}llo:${pom.version}", "${APP}-prod/${APP}:${pom.version}");
 
                             if (!openshift.selector("dc", "${APP}").exists()) {
-                                createApp("${APP}");                   
+                                createApp("${APP}", pom.version);                   
                             } else {
                                 // Rollouts to latest version
                                 openshift.selector("dc", "${APP}").rollout().latest();   
@@ -82,31 +100,9 @@ pipeline {
     }
 }
 
-def createAppBuild(app, repo, branch) {
-    // BuildConfig does not exists so creates it
-    def bc = openshift.newBuild("redhat-openjdk18-openshift:1.2~${repo}#${branch}", "--name=${app}", "--strategy=source").narrow("bc");
-    
-    // Gets the Builds related to the BuildConfig
-    def builds = bc.related("builds");
-    
-    // Gets a map with the BuildConfig values
-    def bcMap = bc.object();
-
-    // Sets incremental builds
-    bcMap.spec.strategy.sourceStrategy["incremental"] = true;
-    
-    // Applies the changes
-    openshift.apply(bcMap);            
-
-    // Waits for the Build completion
-    builds.untilEach(1) { 
-        return (it.object().status.phase == "Complete")
-    }                   
-}
-
-def createApp(app) {
+def createApp(app, tag) {
     // Creates the application and get the brand new BuildConfig
-    openshift.newApp("${app}:latest");
+    openshift.newApp("${app}:${tag}");
     // Creates the hello Route
     openshift.selector("svc", app).expose();
 
