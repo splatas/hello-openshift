@@ -1,6 +1,8 @@
 # hello-openshift
 
-Hello world example for OpenShift.
+A hello world pipeline example for OpenShift.
+
+![pipeline](hello-pipeline.png)
 
 ## Requisites
 
@@ -9,7 +11,7 @@ Hello world example for OpenShift.
 
 ## Usage
 
-See the **provision.sh** script file.
+See the **provision.sh** script file and then run it.
 
     sh provision.sh
 
