@@ -6,7 +6,7 @@ pipeline {
         skipDefaultCheckout() 
     }
     stages {
-        stage("Checkout SCM") {
+        stage("Checkout") {
             steps {
                 git branch: env.BRANCH, url: env.REPO
             }
@@ -75,6 +75,14 @@ pipeline {
                             }                            
                         }
                     }
+                }
+            }
+        }
+        stage("Integration Test") {
+            steps {
+                script {
+                    // Integration Tests
+                    sleep(5);
                 }
             }
         }
