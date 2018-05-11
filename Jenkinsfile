@@ -27,7 +27,7 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject("${APP}-dev") {
                             if (!openshift.selector("bc", "${APP}").exists()) {
-                                openshift.newBuild("--image-stream=redhat-openjdk18-openshift:1.2", "--name=${app}", "--binary=true").narrow("bc");                   
+                                openshift.newBuild("--image-stream=redhat-openjdk18-openshift:1.2", "--name=${APP}", "--binary=true");                   
                             }
                             // Starts a new build and waits for its completion
                             openshift.selector("bc", "${APP}").startBuild("--from-file=target/${APP}-swarm.jar", "--wait=true");
@@ -39,7 +39,6 @@ pipeline {
         stage("Deploy DEV") {
             steps {
                 script {
-                    openshift.verbose()
                     openshift.withCluster() {
                         openshift.withProject("${APP}-dev") {
                             if (!openshift.selector("dc", "${APP}").exists()) {
@@ -52,7 +51,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }i
         stage("Deploy TEST") {
             steps {
                 script {
