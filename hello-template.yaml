@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: Template
+metadata:
+  annotations:
+    openshift.io/display-name: Hello Template
+    iconClass: fa fa-code
+  name: hello-template
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: ${PARAM_APP_NAME}
+    name: ${PARAM_APP_NAME}-pipeline
+  spec:
+    source:
+      type: Git
+      git:
+        uri: ${PARAM_GIT_REPO}
+        ref: ${PARAM_GIT_BRANCH}
+    strategy:
+      jenkinsPipelineStrategy:
+        env:
+        - name: APP_NAME
+          value: ${PARAM_APP_NAME}
+        - name: APP_ARTIFACTS_DIR
+          value: ${PARAM_APP_ARTIFACTS_DIR}
+        - name: GIT_REPO
+          value: ${PARAM_GIT_REPO}
+        - name: GIT_BRANCH
+          value: ${PARAM_GIT_BRANCH}
+        jenkinsfilePath: Jenkinsfile
+      type: JenkinsPipeline
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      build: ${PARAM_APP_NAME}
+    name: ${PARAM_APP_NAME}
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: ${PARAM_APP_NAME}
+    name: ${PARAM_APP_NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${PARAM_APP_NAME}:latest
+    source:
+      type: Binary
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: ${PARAM_BASE_IMAGE}
+          namespace: openshift
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: ${PARAM_APP_NAME}
+    name: ${PARAM_APP_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${PARAM_APP_NAME}
+      deploymentconfig: ${PARAM_APP_NAME}
+    strategy:
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: ${PARAM_APP_NAME}
+          deploymentconfig: ${PARAM_APP_NAME}
+      spec:
+        containers:
+        - image: ${PARAM_APP_NAME}:latest
+          imagePullPolicy: Always
+          name: ${PARAM_APP_NAME}
+          ports:
+          - containerPort: ${PARAM_APP_PORT}
+            protocol: TCP
+    triggers: []
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${PARAM_APP_NAME}
+    name: ${PARAM_APP_NAME}
+  spec:
+    ports:
+    - name: ${PARAM_APP_PORT}-tcp
+      port: ${{PARAM_APP_PORT}}
+      protocol: TCP
+      targetPort: ${{PARAM_APP_PORT}}
+    selector:
+      app: ${PARAM_APP_NAME}
+      deploymentconfig: ${PARAM_APP_NAME}
+    type: ClusterIP
+parameters:
+- name: PARAM_APP_NAME
+  displayName: Application Name
+  description: Application Name
+  required: true
+  value: hello
+- name: PARAM_APP_PORT
+  displayName: Application Port
+  description: Application Port
+  required: true
+  value: "8080"
+- name: PARAM_APP_ARTIFACTS_DIR
+  displayName: Artifacts Directory
+  description: Artifacts Directory
+  required: true
+  value: ./target
+- name: PARAM_BASE_IMAGE
+  displayName: Base Image
+  description: Base Image
+  required: true
+  value: redhat-openjdk18-openshift:1.2
+- name: PARAM_GIT_REPO
+  displayName: Git Repository
+  description: Git Repository
+  required: true
+  value: https://github.com/leandroberetta/hello-openshift.git
+- name: PARAM_GIT_BRANCH
+  displayName: Git Branch
+  description: Git Branch
+  required: true
+  value: develop
