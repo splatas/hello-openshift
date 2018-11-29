@@ -25,8 +25,8 @@ pipeline {
         stage("Build Image") {
             steps {
                 script {
-                    openshift.withCluster() {
-                        openshift.withProject("${APP_NAME}-dev") {
+                    openshift.withCluster {
+                        openshift.withProject {
                             openshift.selector("bc", "${APP_NAME}").startBuild("--from-file=${APP_ARTIFACTS_DIR}", "--wait=true");
                         }
                     }
@@ -36,8 +36,8 @@ pipeline {
         stage("Deploy DEV") {
             steps {
                 script {
-                    openshift.withCluster() {
-                        openshift.withProject("${APP_NAME}-dev") {
+                    openshift.withCluster {
+                        openshift.withProject {
                             openshift.selector("dc", "${APP_NAME}").rollout().latest();
                         }
                     }
