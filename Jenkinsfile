@@ -27,7 +27,7 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${APP_NAME}-dev") {
-                            openshift.selector("bc", "${APP_NAME}").startBuild("--from-file=${ARTIFACTS_DIR}", "--wait=true");
+                            openshift.selector("bc", "${APP_NAME}").startBuild("--from-file=${APP_ARTIFACTS_DIR}", "--wait=true");
                         }
                     }
                 }
@@ -38,7 +38,6 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${APP_NAME}-dev") {
-                            // Rollouts to latest version
                             openshift.selector("dc", "${APP_NAME}").rollout().latest();
                         }
                     }
