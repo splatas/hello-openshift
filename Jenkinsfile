@@ -38,9 +38,8 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${APP_NAME}-dev") {
-                                // Rollouts to latest version
-                                openshift.selector("dc", "${APP_NAME}").rollout().latest();
-                            }          
+                            // Rollouts to latest version
+                            openshift.selector("dc", "${APP_NAME}").rollout().latest();
                         }
                     }
                 }
