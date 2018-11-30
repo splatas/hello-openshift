@@ -10,7 +10,7 @@ objects:
   kind: BuildConfig
   metadata:
     labels:
-      build: ${PARAM_APP_NAME}
+      app: ${PARAM_APP_NAME}
     name: ${PARAM_APP_NAME}-pipeline
   spec:
     source:
@@ -82,7 +82,14 @@ objects:
           ports:
           - containerPort: 8080
             protocol: TCP
-    triggers: []
+    triggers:
+    - imageChangeParams:
+        containerNames:
+          - hello-openshift
+        from:
+          kind: ImageStreamTag
+          name: hello-openshift:latest
+      type: ImageChange
 - apiVersion: v1
   kind: Service
   metadata:
