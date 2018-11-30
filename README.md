@@ -28,7 +28,7 @@ Hello World application to demonstrate OpenShift concepts and Jenkins pipelines.
         Access your application via route 'hello-openshift-hello-dev.192.168.64.112.nip.io'
         Run 'oc status' to view your app.
 
-## Overwiew
+## Overview
 
 ![Pipeline](src/main/resources/hello-openshift.png)
 
