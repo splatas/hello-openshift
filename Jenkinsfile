@@ -27,9 +27,6 @@ pipeline {
                 script {
                     openshift.withCluster {
                         openshift.withProject {
-                            if (!openshift.selector("bc", env.APP_NAME).exists())
-                                openshift.newBuild("--image-stream=${BASE_IMAGE}", "--name=${APP_NAME}", "--binary=true");
-                            
                             openshift.selector("bc", env.APP_NAME).startBuild("--from-file=${APP_ARTIFACTS_DIR}", "--wait=true");
                         }
                     }
@@ -41,10 +38,7 @@ pipeline {
                 script {
                     openshift.withCluster {
                         openshift.withProject {
-                            if (!openshift.selector("dc", env.APP_NAME).exists()) {
-                                openshift.newApp("${APP_NAME}:latest");
-                            }    
-                         
+                            openshift.selector("dc", env.APP_NAME).rollout().latest()
                             openshift.selector("dc", env.APP_NAME).rollout().status()
                         }
                     }
