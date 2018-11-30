@@ -28,11 +28,11 @@ Hello World application to demonstrate OpenShift concepts and Jenkins pipelines.
         Access your application via route 'hello-openshift-hello-dev.192.168.64.112.nip.io'
         Run 'oc status' to view your app.
 
-## Pipeline
+## Pipeline
 
 ![Pipeline](src/main/resources/hello-openshift.png)
 
-When OpenShift detects a BuildConfig of type JenkinsPipeline deploys a Jenkins instance in the project where the BuildConfig exists to run the pipeline.
+When OpenShift detects a BuildConfig of type JenkinsPipeline, it deploys a Jenkins instance in the project where the BuildConfig exists to run the pipeline.
 
 The pipeline can be run with the following command:
 
