@@ -27,7 +27,19 @@ pipeline {
                 script {
                     openshift.withCluster {
                         openshift.withProject {
-                            openshift.selector("bc", env.APP_NAME).startBuild("--from-file=${APP_ARTIFACTS_DIR}", "--wait=true");
+                            openshift.selector("bc", env.APP_NAME).startBuild("--from-dir=${APP_ARTIFACTS_DIR}", "--wait=true");
+                        }
+                    }
+                }
+            }
+        }
+        stage("Tag Image") {
+            steps {
+                script {
+                    openshift.withCluster {
+                        openshift.withProject {
+                            env.TAG = readMavenPom().getVersion()
+                            openshift.tag("${APP_NAME}:latest", "${APP_NAME}:${TAG}")
                         }
                     }
                 }
@@ -38,6 +50,8 @@ pipeline {
                 script {
                     openshift.withCluster {
                         openshift.withProject {
+                            openshift.set("triggers", "dc/${APP_NAME}", "--remove-all")
+                            openshift.set("triggers", "dc/${APP_NAME}", "--from-image=${APP_NAME}:${TAG}", "-c ${APP_NAME}", "--manual")
                             openshift.selector("dc", env.APP_NAME).rollout().latest()
                             openshift.selector("dc", env.APP_NAME).rollout().status()
                         }

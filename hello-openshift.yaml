@@ -2,13 +2,15 @@ apiVersion: v1
 kind: Template
 metadata:
   annotations:
-    openshift.io/display-name: Hello from OpenShift
+    openshift.io/display-name: Hello from OpenShift!
     iconClass: fa fa-code
   name: hello-openshift
 objects:
 - apiVersion: v1
   kind: BuildConfig
   metadata:
+    annotations:
+      pipeline.alpha.openshift.io/uses: '[{"name": "${PARAM_APP_NAME}", "kind": "DeploymentConfig"}]'
     labels:
       app: ${PARAM_APP_NAME}
     name: ${PARAM_APP_NAME}-pipeline
@@ -130,4 +132,4 @@ parameters:
   displayName: Git Branch
   description: Git Branch
   required: true
-  value: develop
+  value: master
