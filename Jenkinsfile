@@ -17,7 +17,7 @@ pipeline {
                 sh "mvn package -DskipTests"
             }
         }
-        stage("Test") {
+        stage("Test Code") {
             steps {
                 sh "mvn test"
             }
@@ -27,18 +27,25 @@ pipeline {
                 script {
                     openshift.withCluster {
                         openshift.withProject {
-                            openshift.selector("bc", "${APP_NAME}").startBuild("--from-file=${APP_ARTIFACTS_DIR}", "--wait=true");
+                            if (!openshift.selector("bc", env.APP_NAME).exists())
+                                openshift.newBuild("--image-stream=${BASE_IMAGE}", "--name=${APP_NAME}", "--binary=true");
+                            
+                            openshift.selector("bc", env.APP_NAME).startBuild("--from-file=${APP_ARTIFACTS_DIR}", "--wait=true");
                         }
                     }
                 }
             }
         }
-        stage("Deploy DEV") {
+        stage("Deploy Application") {
             steps {
                 script {
                     openshift.withCluster {
                         openshift.withProject {
-                            openshift.selector("dc", "${APP_NAME}").rollout().latest();
+                            if (!openshift.selector("dc", env.APP_NAME).exists()) {
+                                openshift.newApp("${APP_NAME}:latest");
+                            }    
+                         
+                            openshift.selector("dc", env.APP_NAME).rollout().status()
                         }
                     }
                 }

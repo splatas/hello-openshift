@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Template
+metadata:
+  annotations:
+    openshift.io/display-name: Hello from OpenShift
+    iconClass: fa fa-code
+  name: hello-openshift
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: ${PARAM_APP_NAME}
+    name: ${PARAM_APP_NAME}-pipeline
+  spec:
+    source:
+      type: Git
+      git:
+        uri: ${PARAM_GIT_REPO}
+        ref: ${PARAM_GIT_BRANCH}
+    strategy:
+      jenkinsPipelineStrategy:
+        env:
+        - name: APP_NAME
+          value: ${PARAM_APP_NAME}
+        - name: APP_ARTIFACTS_DIR
+          value: ./target
+        - name: GIT_REPO
+          value: ${PARAM_GIT_REPO}
+        - name: GIT_BRANCH
+          value: ${PARAM_GIT_BRANCH}
+        - name: BASE_IMAGE
+          value: redhat-openjdk18-openshift:1.2
+        jenkinsfilePath: Jenkinsfile
+      type: JenkinsPipeline
+parameters:
+- name: PARAM_APP_NAME
+  displayName: Application Name
+  description: Application Name
+  required: true
+  value: hello
+- name: PARAM_GIT_REPO
+  displayName: Git Repository
+  description: Git Repository
+  required: true
+  value: https://github.com/leandroberetta/hello-openshift.git
+- name: PARAM_GIT_BRANCH
+  displayName: Git Branch
+  description: Git Branch
+  required: true
+  value: develop
