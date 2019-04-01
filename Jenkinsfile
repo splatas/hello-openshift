@@ -27,7 +27,7 @@ pipeline {
                 script {
                     openshift.withCluster {
                         openshift.withProject {
-                            openshift.selector("bc", env.APP_NAME).startBuild("--from-dir=${APP_ARTIFACTS_DIR}", "--wait=true");
+                            openshift.selector("bc", env.APP_NAME).startBuild("--from-dir=./target", "--wait=true");
                         }
                     }
                 }
@@ -51,8 +51,7 @@ pipeline {
                     openshift.withCluster {
                         openshift.withProject {
                             openshift.set("triggers", "dc/${APP_NAME}", "--remove-all")
-                            openshift.set("triggers", "dc/${APP_NAME}", "--from-image=${APP_NAME}:${TAG}", "-c ${APP_NAME}", "--manual")
-                            openshift.selector("dc", env.APP_NAME).rollout().latest()
+                            openshift.set("triggers", "dc/${APP_NAME}", "--from-image=${APP_NAME}:${TAG}", "-c ${APP_NAME}")
                             openshift.selector("dc", env.APP_NAME).rollout().status()
                         }
                     }

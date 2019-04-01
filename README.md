@@ -4,16 +4,16 @@ Hello World application to demonstrate OpenShift concepts and Jenkins pipelines.
 
 ## Usage
 
-    oc create -f hello-openshift.yaml
+    oc new-project hello-dev
 
-    oc new-app --template=hello-openshift
+    oc new-app -f hello-openshift.yaml
 
     --> Deploying template "hello-dev/hello-openshift" to project hello-dev
 
         * With parameters:
             * Application Name=hello-openshift
             * Git Repository=https://github.com/leandroberetta/hello-openshift.git
-            * Git Branch=develop
+            * Git Branch=master
 
     --> Creating resources ...
         buildconfig "hello-openshift-pipeline" created
