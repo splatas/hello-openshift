@@ -6,6 +6,14 @@ Hello World application to demonstrate OpenShift concepts and Jenkins pipelines.
 
     oc new-project hello-dev
 
+    Now using project "hello-dev" on server "https://cloud.veicot.io:8443".
+
+    You can add applications to this project with the 'new-app' command. For example, try:
+
+        oc new-app centos/ruby-25-centos7~https://github.com/sclorg/ruby-ex.git
+
+    to build a new example application in Ruby.
+
     oc new-app -f hello-openshift.yaml
 
     --> Deploying template "hello-dev/hello-openshift" to project hello-dev
@@ -25,10 +33,10 @@ Hello World application to demonstrate OpenShift concepts and Jenkins pipelines.
     --> Success
         Use 'oc start-build hello-openshift-pipeline' to start a build.
         Use 'oc start-build hello-openshift' to start a build.
-        Access your application via route 'hello-openshift-hello-dev.192.168.64.112.nip.io'
+        Access your application via route 'hello-openshift-hello-dev.cloud.veicot.io'
         Run 'oc status' to view your app.
 
 ## Overview
 
-![Pipeline](src/main/resources/hello-openshift.png)
+![Pipeline](hello-openshift.png)
 
