@@ -1,4 +1,4 @@
-# hello-openshift
+# Hello OpenShift
 
 Hello World application to demonstrate OpenShift concepts and Jenkins pipelines.
 
