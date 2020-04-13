@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: ns-customer-experience-template
+objects:
+parameters:
+- description: Application Name
+  displayName: Application Name
+  name: APP_NAME
+  required: true
+  value: ns-customer-experience-service

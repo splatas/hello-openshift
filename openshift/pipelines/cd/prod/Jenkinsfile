@@ -1,0 +1,5 @@
+runProdPipeline(application: env.APP_NAME,
+              agent: "maven",
+              compileCommands: "mvn package -DskipTests -Dfabric8.skip -e -B",
+              testCommands: "mvn test",
+              artifactsDir: ".")
